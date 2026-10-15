@@ -97,12 +97,14 @@ class ClosedLoop:
         positions = np.zeros((T, 2))
         actions = np.zeros(T)
         self.plant.reset_state()
+        # Reset the state of the controller
+        self.controller.reset()
 
         for t in range(T):
             positions[t] = self.plant.get_position()
             observation_t = self.plant.get_depth()
             # Call your controller here
-            # Get the reference depth for the current time step
+            # Get the reference depth for the current time step from the mission
             reference_t = mission.reference[t]
             # Calculate the error between the reference depth and the actual depth
             error_t = reference_t - observation_t
