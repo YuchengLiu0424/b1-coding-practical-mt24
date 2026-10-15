@@ -75,10 +75,11 @@ class Mission:
 
     @classmethod
     def from_csv(cls, file_name: str):
+        # Read csv file using pandas
         data = pd.read_csv(file_name)
-        reference = data['reference']
-        cave_height = data['cave_height']
-        cave_depth = data['cave_depth']
+        # Extract the  columns and convert to numpy arrays
+        (reference, cave_height, cave_depth) = (data['reference'].to_numpy(), data['cave_height'].to_numpy(), data['cave_depth'].to_numpy())
+        # Return an instance of the Mission class
         return cls(reference, cave_height, cave_depth)
 
 
@@ -101,6 +102,12 @@ class ClosedLoop:
             positions[t] = self.plant.get_position()
             observation_t = self.plant.get_depth()
             # Call your controller here
+            # Get the reference depth for the current time step
+            reference_t = mission.reference[t]
+            # Calculate the error between the reference depth and the actual depth
+            error_t = reference_t - observation_t
+            # Implement the controller logic to determine what action to take based on the error
+            actions[t] = self.controller(error_t)
             self.plant.transition(actions[t], disturbances[t])
 
         return Trajectory(positions)
